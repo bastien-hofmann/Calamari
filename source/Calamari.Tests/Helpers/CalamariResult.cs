@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ApprovalTests;
 using Calamari.Integration.ServiceMessages;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
+#if APPROVAL_TESTS
+using ApprovalTests;
+#endif
 
 namespace Calamari.Tests.Helpers
 {
@@ -160,9 +162,11 @@ namespace Calamari.Tests.Helpers
             Assert.That(allOutput, Is.StringContaining(expectedOutput));
         }
 
+#if APPROVAL_TESTS
         public void ApproveOutput()
         {
             Approvals.Verify(captured.ToApprovalString());
         }
+#endif
     }
 }
