@@ -26,22 +26,12 @@ namespace Calamari.Integration.Scripting.FSharp
 
             var myPath = typeof(FSharpEngine).GetTypeInfo().Assembly.Location;
             var parent = Path.GetDirectoryName(myPath);
+            var executable = Path.GetFullPath(Path.Combine(parent, "FSharp", "fsi.exe"));
 
-            var attemptOne = Path.GetFullPath(Path.Combine(parent, "FSharp", "fsi.exe"));
-            if (File.Exists(attemptOne))
-                return attemptOne;
+            if (File.Exists(executable))
+                return executable;
 
-            var attemptTwo = Path.GetFullPath(Path.Combine("..", "..", "packages", "FSharp.Compiler.Tools.4.0.0.1", "tools", "fsi.exe"));
-            if (File.Exists(attemptTwo)) return attemptTwo;
-
-            var attemptThree = Path.GetFullPath(Path.Combine("..", "packages", "FSharp.Compiler.Tools.4.0.0.1", "tools", "fsi.exe"));
-            if (File.Exists(attemptThree)) return attemptThree;
-
-            var attemptFour = Path.GetFullPath(
-                Path.Combine(CrossPlatform.GetHomeFolder(), ".nuget", "packages", "FSharp.Compiler.Tools", "4.0.0.1", "tools", "fsi.exe"));
-            if (File.Exists(attemptFour)) return attemptFour;
-
-            throw new CommandException(string.Format("fsi.exe was not found at either '{0}', '{1}' or '{2}' or '{3}'", attemptOne, attemptTwo, attemptThree, attemptFour));
+            throw new CommandException(string.Format("fsi.exe was not found at '{0}'", executable));
         }
 
         public static string FormatCommandArguments(string bootstrapFile, string scriptParameters)
