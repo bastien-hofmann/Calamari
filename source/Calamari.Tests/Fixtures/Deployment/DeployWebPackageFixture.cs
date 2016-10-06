@@ -131,15 +131,24 @@ namespace Calamari.Tests.Fixtures.Deployment
         }
         
         [Test]
-        [RequiresMonoVersion423OrAbove] //Bug in mono < 4.2.3 https://bugzilla.xamarin.com/show_bug.cgi?id=19426
-        public void ShouldInvokeDeployFailedOnError()
+        [Category(TestEnvironment.CompatibleOS.Windows)] 
+        public void ShouldInvokeDeployFailedOnErrorWindows()
         {
             Variables.Set("ShouldFail", "yes");
             var result = DeployPackage();
-            if (ScriptingEnvironment.IsRunningOnMono())
-                result.AssertOutput("I have failed! DeployFailed.sh");
-            else
-                result.AssertOutput("I have failed! DeployFailed.ps1");
+            result.AssertOutput("I have failed! DeployFailed.ps1");
+            result.AssertOutput("I have failed! DeployFailed.fsx");
+            result.AssertOutput("I have failed! DeployFailed.csx");
+        }
+
+        [Test]
+        [Category(TestEnvironment.CompatibleOS.Nix)] 
+        [RequiresMonoVersion423OrAbove] //Bug in mono < 4.2.3 https://bugzilla.xamarin.com/show_bug.cgi?id=19426
+        public void ShouldInvokeDeployFailedOnErrorNix()
+        {
+            Variables.Set("ShouldFail", "yes");
+            var result = DeployPackage();
+            result.AssertOutput("I have failed! DeployFailed.sh");
             result.AssertOutput("I have failed! DeployFailed.fsx");
             result.AssertOutput("I have failed! DeployFailed.csx");
         }

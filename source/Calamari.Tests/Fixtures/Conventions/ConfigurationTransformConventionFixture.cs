@@ -26,7 +26,7 @@ namespace Calamari.Tests.Fixtures.Conventions
         [SetUp]
         public void SetUp()
         {
-            fileSystem = new WindowsPhysicalFileSystem();
+            fileSystem = CalamariPhysicalFileSystem.GetPhysicalFileSystem();
             configurationTransformer = Substitute.For<IConfigurationTransformer>();
             transformFileLocator = new TransformFileLocator(fileSystem);
             

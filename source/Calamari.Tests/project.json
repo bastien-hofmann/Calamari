@@ -93,8 +93,12 @@
         "Fixtures/PowerShell/Scripts/**",
         "Fixtures/ScriptCS/Scripts/**",
         "Fixtures/Substitutions/Samples/**"
-      ]
-    }
+      ],
+      "mappings": {
+        "OctoDiff/": "../Tools/OctoDiff**/",
+        "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
+        "ScriptCS/": "../Tools/ScriptCS**/"
+      }
   },
   "runtimes": {
     "win7-x64": {},
