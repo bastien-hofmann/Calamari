@@ -69,22 +69,22 @@ namespace Calamari.Integration.Packages.NuGet
             }
 
 #if USE_NUGET_V2_LIBS
-                    // NuGet V3 feed 
-                    else if (IsHttp(feedUri.ToString()) && feedUri.ToString().EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-                    {
-                        NuGetV3Downloader.DownloadPackage(packageId, version, feedUri, feedCredentials, targetFilePath);
-                    }
+            // NuGet V3 feed 
+            else if (IsHttp(feedUri.ToString()) && feedUri.ToString().EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                NuGetV3Downloader.DownloadPackage(packageId, version, feedUri, feedCredentials, targetFilePath);
+            }
 
-                    // V2 feed
-                    else 
-                    {
-                        NuGetV2Downloader.DownloadPackage(packageId, version.ToString(), feedUri, feedCredentials, targetFilePath);
-                    }
+            // V2 feed
+            else 
+            {
+                NuGetV2Downloader.DownloadPackage(packageId, version.ToString(), feedUri, feedCredentials, targetFilePath);
+            }
 #else
-                    else
-                    {
-                        NuGetV3LibDownloader.DownloadPackage(packageId, version, feedUri, feedCredentials, targetFilePath);
-                    }
+            else
+            {
+                NuGetV3LibDownloader.DownloadPackage(packageId, version, feedUri, feedCredentials, targetFilePath);
+            }
 #endif
         }
 
