@@ -11,7 +11,7 @@
     <licenseUrl>https://github.com/OctopusDeploy/Calamari/blob/master/LICENSE</licenseUrl>
   </metadata>
   <files>
-    <file src="**\*.*" target="" />
-    <file src="**/*.*" target="" />
+    <file src="**\*.*" target="" exclude="project.json"/>
+    <file src="**/*.*" target="" exclude="project.json"/>
   </files>
 </package>

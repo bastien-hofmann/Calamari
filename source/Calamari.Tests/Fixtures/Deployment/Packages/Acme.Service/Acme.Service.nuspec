@@ -11,4 +11,8 @@
     <description>A sample project containing a Windows service.</description>
     <language>en-US</language>
   </metadata>
+   <files>
+    <file src="**\*.*" target="" exclude="project.json"/>
+    <file src="**/*.*" target="" exclude="project.json"/>
+  </files>
 </package>

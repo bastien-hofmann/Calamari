@@ -13,6 +13,7 @@ namespace Calamari.Integration.Processes
         readonly List<string> arguments = new List<string>();
         bool dotnet;
         bool rawArgList;
+        bool doubleDash;
 
         public static CommandLine Execute(string executable)
         {
@@ -56,6 +57,12 @@ namespace Calamari.Integration.Processes
             return this;
         }
 
+        public CommandLine DoubleDash()
+        {
+            doubleDash = true;
+            return this;
+        }
+
         public CommandLine Flag(string flagName)
         {
             arguments.Add(MakeFlag(flagName));
@@ -64,7 +71,12 @@ namespace Calamari.Integration.Processes
 
         string MakeFlag(string flagName)
         {
-            return "-" + Normalize(flagName);
+            return GetDash() + Normalize(flagName);
+        }
+
+        string GetDash()
+        {
+            return doubleDash ? "--" : "-";
         }
 
         public CommandLine PositionalArgument(object argValue)
@@ -100,7 +112,7 @@ namespace Calamari.Integration.Processes
             else if (argValue != null)
                 sval = argValue.ToString();
 
-            return string.Format("-{0} {1}", Normalize(argName), Escape(sval));
+            return string.Format("{2}{0} {1}", Normalize(argName), Escape(sval), GetDash());
         }
 
         string Escape(string argValue)
