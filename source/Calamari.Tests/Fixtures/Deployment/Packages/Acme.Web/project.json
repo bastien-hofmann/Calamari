@@ -4,7 +4,6 @@
     "authors": [ "Octopus Deploy" ],
     "description": "Test project for Calamari.",
     "language": "en-US",
-    
     "frameworks": {
         "netstandard1.0": {}
     },
@@ -12,7 +11,8 @@
         "projectUrl": "https://github.com/OctopusDeploy/Calamari/",
         "licenseUrl": "https://github.com/OctopusDeploy/Calamari/blob/master/LICENSE",
         "files": {
-            "include": "**/*.*"
+            "include": "**/*.*",
+            "exclude": [ "project.json", "*.nuspec" ]
         }
     }
 }
