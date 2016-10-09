@@ -25,6 +25,13 @@ namespace Calamari.Tests.Helpers
 
             public const string Windows = "Windows";
         }
+
+        public static class ScriptingSupport
+        {
+            public const string FSharp = "fsharp";
+
+            public const string ScriptCS = "scriptcs";
+        }
     }
 }
 

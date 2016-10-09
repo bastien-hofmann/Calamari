@@ -142,7 +142,9 @@ namespace Calamari.Tests.Fixtures.Deployment
         }
 
         [Test]
-        [Category(TestEnvironment.CompatibleOS.Nix)] 
+        [Category(TestEnvironment.CompatibleOS.Nix)]
+        [Category(TestEnvironment.ScriptingSupport.FSharp)]
+        [Category(TestEnvironment.ScriptingSupport.ScriptCS)]
         [RequiresMonoVersion423OrAbove] //Bug in mono < 4.2.3 https://bugzilla.xamarin.com/show_bug.cgi?id=19426
         public void ShouldInvokeDeployFailedOnErrorNix()
         {
