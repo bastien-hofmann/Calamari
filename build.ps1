@@ -40,8 +40,8 @@ http://cakebuild.net
 
 [CmdletBinding()]
 Param(
-    [string]$Script = "build.cake",
     [string]$Target = "Default",
+    [string]$Script = "build.cake",  
     [ValidateSet("Release", "Debug")]
     [string]$Configuration = "Release",
     [ValidateSet("net40", "net451", "netcoreapp1.0")]    
@@ -54,8 +54,10 @@ Param(
     [switch]$WhatIf,
     [switch]$Mono,
     [switch]$SkipToolPackageRestore,
-    [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
-    [string[]]$ScriptArgs
+    [switch]$ForceCIBuild
+    # ,
+    # [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
+    # [string[]]$ScriptArgs
 )
 
 [Reflection.Assembly]::LoadWithPartialName("System.Security") | Out-Null
@@ -114,6 +116,12 @@ if($Experimental.IsPresent -and !($Mono.IsPresent)) {
 $UseDryRun = "";
 if($WhatIf.IsPresent) {
     $UseDryRun = "-dryrun"
+}
+
+# Force this to be a CI build
+$ForceIsCIBuild = "false";
+if($ForceCIBuild.IsPresent) {
+    $ForceIsCIBuild = "true"
 }
 
 # Make sure tools folder exists
@@ -188,5 +196,5 @@ if (!(Test-Path $CAKE_EXE)) {
 
 # Start Cake
 Write-Host "Running build script..."
-Invoke-Expression "& `"$CAKE_EXE`" `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" -framework=`"$Framework`" -where=`"$Where`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
+Invoke-Expression "& `"$CAKE_EXE`" `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" -framework=`"$Framework`" -where=`"$Where`" -forcecibuild=`"$ForceIsCiBuild`" $UseMono $UseDryRun $UseExperimental"# $ScriptArgs"
 exit $LASTEXITCODE

@@ -11,15 +11,17 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var testFilter = Argument("where", "");
 var framework = Argument("framework", "");
+var forceCiBuild = Argument("forceCiBuild", false);
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
-var artifactsDir = "./artifacts";
+var artifactsDir = "./built-packages/";
 var globalAssemblyFile = "./Calamari/Properties/AssemblyInfo.cs";
-var projectsToPackage = new []{"./source/Calamari", "./source/Calamari.Azure"};
+var sourceFolder = "./source/";
+var projectsToPackage = new []{"Calamari", "Calamari.Azure"};
 
-var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
+var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild || forceCiBuild;
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -45,16 +47,16 @@ Teardown(context =>
 //////////////////////////////////////////////////////////////////////
 
 Task("__Default")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
+    .IsDependentOn("__Clean")
+    .IsDependentOn("__Restore")
     .IsDependentOn("__UpdateAssemblyVersionInformation")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
+    .IsDependentOn("__Build")
+    .IsDependentOn("__Test")
     .IsDependentOn("__UpdateProjectJsonVersion")
-    .IsDependentOn("__Pack");
-    //.IsDependentOn("__Publish");
+    .IsDependentOn("__Pack")
+    .IsDependentOn("__Publish");
 
-Task("Clean")
+Task("__Clean")
     .Does(() =>
 {
     CleanDirectory(artifactsDir);
@@ -62,7 +64,7 @@ Task("Clean")
     CleanDirectories("./**/obj");
 });
 
-Task("Restore")
+Task("__Restore")
     .Does(() => DotNetCoreRestore());
 
 Task("__UpdateAssemblyVersionInformation")
@@ -79,7 +81,7 @@ Task("__UpdateAssemblyVersionInformation")
     Information("AssemblyInformationalVersion -> {0}", gitVersionInfo.InformationalVersion);
 });
 
-Task("Build")
+Task("__Build")
     .Does(() =>
 {
     var settings =  new DotNetCoreBuildSettings
@@ -93,7 +95,7 @@ Task("Build")
     DotNetCoreBuild("**/project.json", settings);
 });
 
-Task("Test")
+Task("__Test")
     .Does(() =>
 {
     var settings =  new DotNetCoreTestSettings
@@ -111,8 +113,25 @@ Task("Test")
             return f;
         };
 
-    if(string.IsNullOrEmpty(framework) || framework != "netcoreapp1.0")
-        DotNetCoreTest("source/Calamari.Azure.Tests/project.json", settings);
+     DotNetCoreTest("source/Calamari.Tests/project.json", settings);
+});
+
+Task("__TestWin")
+    .Does(() =>
+{
+    var settings =  new DotNetCoreTestSettings
+    {
+        Configuration = configuration
+    };
+
+    if(!string.IsNullOrEmpty(framework))
+        settings.Framework = framework;  
+
+    settings.ArgumentCustomization = f => {
+        f.Append("-where");
+        f.AppendQuoted("cat != Nix");
+        return f;
+    };
 
      DotNetCoreTest("source/Calamari.Tests/project.json", settings);
 });
@@ -123,7 +142,7 @@ Task("__UpdateProjectJsonVersion")
 {
     foreach(var projectToPackage in projectsToPackage)
     {
-        var projectToPackagePackageJson = $"{projectToPackage}/project.json";
+        var projectToPackagePackageJson = $"{sourceFolder}{projectToPackage}/project.json";
         Information("Updating {0} version -> {1}", projectToPackagePackageJson, nugetVersion);
 
         TransformConfig(projectToPackagePackageJson, projectToPackagePackageJson, new TransformationCollection {
@@ -135,19 +154,43 @@ Task("__UpdateProjectJsonVersion")
 Task("__Pack")
     .Does(() =>
 {
-    foreach(var projectToPackage in projectsToPackage)
-    {
-        DotNetCorePack(projectToPackage, new DotNetCorePackSettings
+
+    DotNetCorePublish("./source/Calamari", new DotNetCorePublishSettings
         {
             Configuration = configuration,
-            OutputDirectory = artifactsDir,
+            OutputDirectory = artifactsDir + "Calamari/net40",
+            Framework = "net40",
             NoBuild = true
         });
-    };
+
+    DotNetCorePublish("./source/Calamari", new DotNetCorePublishSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsDir + "Calamari/netcoreapp1.0",
+            Framework = "netcoreapp1.0",
+            NoBuild = true
+        });
+
+   DotNetCorePublish("./source/Calamari.Azure", new DotNetCorePublishSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsDir + "Calamari.Azure",
+            Framework = "net45",
+            NoBuild = true
+        });
+    // foreach(var projectToPackage in projectsToPackage)
+    // {
+    //     DotNetCorePublish(sourceFolder + projectToPackage, new DotNetCorePublishSettings
+    //     {
+    //         Configuration = configuration,
+    //         OutputDirectory = artifactsDir + projectToPackage,
+    //         NoBuild = true
+    //     });
+    // };
 });
 
 Task("__Publish")
-    .WithCriteria(isContinuousIntegrationBuild)
+    .WithCriteria(isContinuousIntegrationBuild && !forceCiBuild) //don't let publish criteria be overridden with flag
     .Does(() =>
 {
     var isPullRequest = !String.IsNullOrEmpty(EnvironmentVariable("APPVEYOR_PULL_REQUEST_NUMBER"));
@@ -184,6 +227,36 @@ Task("__Publish")
 //////////////////////////////////////////////////////////////////////
 Task("Default")
     .IsDependentOn("__Default");
+
+Task("Clean")
+    .IsDependentOn("__Clean");
+
+Task("Restore")
+    .IsDependentOn("__Restore");
+
+Task("Build")
+    .IsDependentOn("__Build");
+
+Task("TestWin")
+    .IsDependentOn("__TestWin");
+
+Task("Pack")
+    .IsDependentOn("__Clean")
+    .IsDependentOn("__Restore")
+    .IsDependentOn("__UpdateAssemblyVersionInformation")
+    .IsDependentOn("__Build")
+    .IsDependentOn("__UpdateProjectJsonVersion")
+    .IsDependentOn("__Pack");
+
+Task("Publish")
+    .IsDependentOn("__Clean")
+    .IsDependentOn("__Restore")
+    .IsDependentOn("__UpdateAssemblyVersionInformation")
+    .IsDependentOn("__Build")
+    .IsDependentOn("__UpdateProjectJsonVersion")
+    .IsDependentOn("__Pack")
+    .IsDependentOn("__Publish");
+    
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
