@@ -1,8 +1,16 @@
 {
   "version": "0.0.0-*",
+  "name": "Calamari",
+  "authors": [ "Octopus Deploy" ],
+  "description": "Contains the command-line Calamari tool that is used by Tentacle to perform deployment actions on machines.",
+  "language": "en-US",
+  "packOptions": {
+    "projectUrl": "https://github.com/OctopusDeploy/Calamari/",
+    "licenseUrl": "https://github.com/OctopusDeploy/Calamari/blob/master/LICENSE",
+    "owners": [ "Octopus Deploy" ]
+  },
   "dependencies": {
-    "OctoDiff": "1.1.0-dnc0013",
-    "scriptcs": "0.16.1"
+    "OctoDiff": "1.1.0-dnc0013"
   },
   "frameworks": {
     "net40": {
@@ -21,7 +29,6 @@
         "WindowsBase": "*"
       },
       "dependencies": {
-        "FSharp.Compiler.Tools": "4.0.0.1",
         "GitVersionTask": "3.3.0",
         "MarkdownSharp": "1.13.0.0",
         "Microsoft.Bcl": "1.1.9",
@@ -43,12 +50,19 @@
         "System.Spatial": "5.6.2"
       },
       "buildOptions": {
-        "define": [ "NET40", "HAS_SERIALIZABLE_EXCEPTIONS", "CAPI_AES", "HAS_DEFAULT_ENCODING", "USE_NUGET_V2_LIBS", "IIS_SUPPORT", "USE_OCTODIFF_EXE" ]
+        "define": [
+          "NET40",
+          "HAS_SERIALIZABLE_EXCEPTIONS",
+          "CAPI_AES",
+          "HAS_DEFAULT_ENCODING",
+          "USE_NUGET_V2_LIBS",
+          "IIS_SUPPORT",
+          "USE_OCTODIFF_EXE"
+        ]
       }
     },
     "netcoreapp1.0": {
       "dependencies": {
-        "FSharp.Compiler.Tools": "4.0.1.10",
         "Markdown": "2.1.0",
         "Microsoft.NETCore.Runtime.CoreCLR": "1.0.4",
         "Microsoft.NETCore.DotNetHostPolicy": "1.0.1",
@@ -79,7 +93,11 @@
         "System.Text.Encoding.CodePages": "4.0.1"
       },
       "buildOptions": {
-        "define": [ "USE_OCTOPUS_XMLT", "USE_SYSTEM_IO_DIRECTORY", "USE_NUGET_V3_LIBS" ]
+        "define": [
+          "USE_OCTOPUS_XMLT",
+          "USE_SYSTEM_IO_DIRECTORY",
+          "USE_NUGET_V3_LIBS"
+        ]
       }
     }
   },
@@ -100,13 +118,25 @@
       ]
     }
   },
+  "copyToOutput": {
+    "mappings": {
+      "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
+      "ScriptCS/": "../Tools/ScriptCS**/"
+    }
+  },
+  "publishOptions": {
+    "mappings": {
+      "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
+      "ScriptCS/": "../Tools/ScriptCS**/"
+    }
+  },
   "runtimes": {
     "win7-x64": {},
-    "ubuntu.14.04-x64" :{},
+    "ubuntu.14.04-x64": {},
     "ubuntu.16.04-x64": {},
     "debian.8-x64": {},
-    "rhel.7.0-x64":{},
-    "rhel.7.1-x64":{},
-    "rhel.7.2-x64":{}    
+    "rhel.7.0-x64": {},
+    "rhel.7.1-x64": {},
+    "rhel.7.2-x64": {}
   }
 }

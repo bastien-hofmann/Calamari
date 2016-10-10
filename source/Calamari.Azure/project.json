@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0-*",
+  "version": "3.4.31-dnc0001",
   "dependencies": {
     "GitVersionTask": "3.3.0",
     "Hyak.Common": "1.0.3",
@@ -32,6 +32,7 @@
     "Sprache": "2.1.0",
     "System.Spatial": "5.6.4",
     "WindowsAzure.Storage": "4.3.0",
+    "OctoDiff": "1.1.0-dnc0013",
     "Calamari": "*"
   },
   "frameworks": {
@@ -60,6 +61,12 @@
         "Scripts\\DeployAzureCloudService.ps1",
         "Scripts\\SwapAzureCloudServiceDeployment.ps1"
       ]
+    },
+    "copyToOutput": {
+      "mappings": {
+        "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
+        "ScriptCS/": "../Tools/ScriptCS**/"
+      }
     }
   }
 }
