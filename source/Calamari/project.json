@@ -130,6 +130,9 @@
       "ScriptCS/": "../Tools/ScriptCS**/"
     }
   },
+  "scripts": {
+    "precompile": "../Tools/copytools"
+  },
   "runtimes": {
     "win7-x64": {},
     "ubuntu.14.04-x64": {},

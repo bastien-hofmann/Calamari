@@ -68,5 +68,7 @@
         "ScriptCS/": "../Tools/ScriptCS**/"
       }
     }
+  "scripts": {
+    "precompile": "../Tools/copytools azure"
   }
 }
