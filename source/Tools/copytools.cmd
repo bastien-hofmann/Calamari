@@ -1,8 +1,9 @@
 @echo off
-echo %1
+
 SET FSharpVersion=4.0.1.10
 SET ScriptCSVersion=0.16.1
 SET AzurePowershellVersion=1.6.0
+
 SET ToolsFolder=%~dp0
 
 SET FSharpFolder=%ToolsFolder%FSharp.Compiler.Tools.%FSharpVersion%\

@@ -65,9 +65,19 @@
     "copyToOutput": {
       "mappings": {
         "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
-        "ScriptCS/": "../Tools/ScriptCS**/"
+        "ScriptCS/": "../Tools/ScriptCS**/",
+        "AzurePowershell/": "../Tools/Octopus.Dependencies.AzureCmdlets**/PowerShell/"
       }
     }
+  },
+  "publishOptions": {
+    "mappings": {
+      "project.json": "pack.json",
+      "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
+      "ScriptCS/": "../Tools/ScriptCS**/",
+      "AzurePowershell/": "../Tools/Octopus.Dependencies.AzureCmdlets**/PowerShell/"
+    }
+  },
   "scripts": {
     "precompile": "../Tools/copytools azure"
   }

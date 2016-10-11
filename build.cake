@@ -4,6 +4,8 @@
 #tool "nuget:?package=GitVersion.CommandLine&version=4.0.0-beta0007"
 #addin "MagicChunks"
 
+using Path = System.IO.Path;
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -52,7 +54,6 @@ Task("__Default")
     .IsDependentOn("__UpdateAssemblyVersionInformation")
     .IsDependentOn("__Build")
     .IsDependentOn("__Test")
-    .IsDependentOn("__UpdateProjectJsonVersion")
     .IsDependentOn("__Pack")
     .IsDependentOn("__Publish");
 
@@ -136,58 +137,35 @@ Task("__TestWin")
      DotNetCoreTest("source/Calamari.Tests/project.json", settings);
 });
 
-Task("__UpdateProjectJsonVersion")
-    .WithCriteria(isContinuousIntegrationBuild)
-    .Does(() =>
-{
-    foreach(var projectToPackage in projectsToPackage)
-    {
-        var projectToPackagePackageJson = $"{sourceFolder}{projectToPackage}/project.json";
-        Information("Updating {0} version -> {1}", projectToPackagePackageJson, nugetVersion);
-
-        TransformConfig(projectToPackagePackageJson, projectToPackagePackageJson, new TransformationCollection {
-            { "version", nugetVersion }
-        });
-    };
-});
-
 Task("__Pack")
     .Does(() =>
 {
-
-    DotNetCorePublish("./source/Calamari", new DotNetCorePublishSettings
-        {
-            Configuration = configuration,
-            OutputDirectory = artifactsDir + "Calamari/net40",
-            Framework = "net40",
-            NoBuild = true
-        });
-
-    DotNetCorePublish("./source/Calamari", new DotNetCorePublishSettings
-        {
-            Configuration = configuration,
-            OutputDirectory = artifactsDir + "Calamari/netcoreapp1.0",
-            Framework = "netcoreapp1.0",
-            NoBuild = true
-        });
-
-   DotNetCorePublish("./source/Calamari.Azure", new DotNetCorePublishSettings
-        {
-            Configuration = configuration,
-            OutputDirectory = artifactsDir + "Calamari.Azure",
-            Framework = "net45",
-            NoBuild = true
-        });
-    // foreach(var projectToPackage in projectsToPackage)
-    // {
-    //     DotNetCorePublish(sourceFolder + projectToPackage, new DotNetCorePublishSettings
-    //     {
-    //         Configuration = configuration,
-    //         OutputDirectory = artifactsDir + projectToPackage,
-    //         NoBuild = true
-    //     });
-    // };
+    DoPackage("Calamari", "net40", nugetVersion);
+    DoPackage("Calamari.Azure", "net45", nugetVersion);   
 });
+
+private void DoPackage(string project, string framework, string version)
+{
+    DotNetCorePublish(Path.Combine("./source", project), new DotNetCorePublishSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = Path.Combine(artifactsDir, project),
+        Framework = framework
+    });
+
+    TransformConfig(Path.Combine(artifactsDir, project, "project.json"), new TransformationCollection {
+        { "version", version }
+    });
+
+    DotNetCorePack(Path.Combine(artifactsDir, project), new DotNetCorePackSettings
+    {
+        OutputDirectory = artifactsDir,
+        NoBuild = true
+    });
+
+    DeleteDirectory(Path.Combine(artifactsDir, project), true);
+    DeleteFiles(artifactsDir + "*symbols*");
+}
 
 Task("__Publish")
     .WithCriteria(isContinuousIntegrationBuild && !forceCiBuild) //don't let publish criteria be overridden with flag
@@ -245,7 +223,6 @@ Task("Pack")
     .IsDependentOn("__Restore")
     .IsDependentOn("__UpdateAssemblyVersionInformation")
     .IsDependentOn("__Build")
-    .IsDependentOn("__UpdateProjectJsonVersion")
     .IsDependentOn("__Pack");
 
 Task("Publish")
@@ -253,7 +230,6 @@ Task("Publish")
     .IsDependentOn("__Restore")
     .IsDependentOn("__UpdateAssemblyVersionInformation")
     .IsDependentOn("__Build")
-    .IsDependentOn("__UpdateProjectJsonVersion")
     .IsDependentOn("__Pack")
     .IsDependentOn("__Publish");
     
