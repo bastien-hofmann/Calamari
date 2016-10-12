@@ -54,6 +54,7 @@
     }
   },
   "buildOptions": {
+    "platform": "anycpu",
     "emitEntryPoint": true,
     "embed": {
       "include": [

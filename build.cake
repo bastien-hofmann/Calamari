@@ -19,10 +19,8 @@ var forceCiBuild = Argument("forceCiBuild", false);
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
 var artifactsDir = "./built-packages/";
-var globalAssemblyFile = "./Calamari/Properties/AssemblyInfo.cs";
 var sourceFolder = "./source/";
 var projectsToPackage = new []{"Calamari", "Calamari.Azure"};
-
 var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild || forceCiBuild;
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
@@ -72,11 +70,14 @@ Task("__UpdateAssemblyVersionInformation")
     .WithCriteria(isContinuousIntegrationBuild)
     .Does(() =>
 {
-     GitVersion(new GitVersionSettings {
-        UpdateAssemblyInfo = true,
-        UpdateAssemblyInfoFilePath = globalAssemblyFile
-    });
-
+    foreach (var project in projectsToPackage)
+    {
+        GitVersion(new GitVersionSettings {
+            UpdateAssemblyInfo = true,
+            UpdateAssemblyInfoFilePath = Path.Combine(sourceFolder, project, "Properties", "AssemblyInfo.cs")
+        });
+    }
+    
     Information("AssemblyVersion -> {0}", gitVersionInfo.AssemblySemVer);
     Information("AssemblyFileVersion -> {0}", $"{gitVersionInfo.MajorMinorPatch}.0");
     Information("AssemblyInformationalVersion -> {0}", gitVersionInfo.InformationalVersion);
