@@ -29,6 +29,9 @@ var gitVersionInfo = GitVersion(new GitVersionSettings {
 
 var nugetVersion = isContinuousIntegrationBuild ? gitVersionInfo.NuGetVersion : "0.0.0";
 
+if(BuildSystem.IsRunningOnTeamCity)
+    BuildSystem.TeamCity.SetBuildNumber(gitVersionInfo.NuGetVersion);
+
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,22 +186,11 @@ Task("__Publish")
             Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
             ApiKey = EnvironmentVariable("MyGetApiKey")
         });
-        NuGetPush("artifacts/Calamari." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
+        NuGetPush("artifacts/Calamari.Azure." + nugetVersion + ".nupkg", new NuGetPushSettings {
             Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
             ApiKey = EnvironmentVariable("MyGetApiKey")
         });
     }
-//    if (shouldPushToNuGet)
-//    {
-//        NuGetPush("artifacts/Calamari." + nugetVersion + ".nupkg", new NuGetPushSettings {
-//            Source = "https://www.nuget.org/api/v2/package",
-//            ApiKey = EnvironmentVariable("NuGetApiKey")
-//        });
-//        NuGetPush("artifacts/Calamari." + nugetVersion + ".symbols.nupkg", new NuGetPushSettings {
-//            Source = "https://www.nuget.org/api/v2/package",
-//            ApiKey = EnvironmentVariable("NuGetApiKey")
-//        });
-//    }
 });
 
 //////////////////////////////////////////////////////////////////////
