@@ -98,6 +98,7 @@
         "FSharp/": "../Tools/FSharp.Compiler.Tools**/",
         "ScriptCS/": "../Tools/ScriptCS**/"
       }
+    }
   },
   "scripts": {
     "precompile": "./chmodexes"
